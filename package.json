@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "20.15.0"
+  },
   "dependencies": {
     "ejs": "^3.1.10",
     "ejs-mate": "^4.0.0",
