@@ -9,10 +9,9 @@ const Review = require("./Models/review.js");
 engine = require('ejs-mate');
 const wrapAsync = require("./utills/wrapAsync");
 const ExpressError = require("./utills/expressError");
-const {ListingSchema , reviewSchema} = require("./schema.js");
 const { rmSync } = require("fs");
 const dbURL = process.env.MONGO_LINK;
-
+const listingController = require("./controllers/listing.js");
 
 app.set("view engine", "ejs");
 app.use(methodOverride('_method'));
@@ -26,86 +25,29 @@ async function main() {
   await mongoose.connect("mongodb+srv://sayanpub2020:sayan8945097611@cluster-demo.pah6g4g.mongodb.net/?retryWrites=true&w=majority&appName=Cluster-demo");
 }
 
-const validateListing = (req,res,next) => {
-  let result = ListingSchema.validate(req.body);
-  if(result.error){
-    throw new ExpressError(400, result.error);
-  } else {
-    next();
-  }
-}
-const validateReview = (req,res,next) => {
-  let result = reviewSchema.validate(req.body);
-  if(result.error){
-    throw new ExpressError(400, result.error);
-  } else {
-    next();
-  }
-}
 
 //index route
-app.get("/listings", wrapAsync(async (req,res)=>{
-  let allListings = await Listing.find({}).sort({title:1});
-  res.render("listings/index.ejs", {allListings});
-}))
+app.get("/listings", wrapAsync(listingController.index));
 
 //new route
-app.get("/listings/new", (req,res)=> {
-  res.render("listings/new");
-})
+app.get("/listings/new", listingController.renderNewFrom)
 app.post("/listings",
-  validateListing,
-  wrapAsync(async (req,res,next)=>{
-  let newlisting = req.body.listing;
-  await Listing.insertOne(newlisting);
-  res.redirect("/listings");
-}))
+  wrapAsync(listingController.new))
 
 //show route
-app.get("/listings/:id", wrapAsync(async (req,res)=>{
-  let {id} = req.params;
-  let listing = await Listing.findById(id).populate("reviews");
-  res.render("listings/show", {listing});
-}))
+app.get("/listings/:id", wrapAsync(listingController.show))
 
 //update route
 app.get("/listings/:id/edit",
-  validateListing, 
-  wrapAsync(async (req,res)=>{
-  let {id} = req.params;
-  let listing = await Listing.findById(id);
-  res.render("listings/edit", {listing});
-}))
-app.put("/listings/:id", wrapAsync(async(req,res)=>{
-  let {id} = req.params;
-  let listing = await Listing.findById(id);
-  let editedlisting = req.body.listing;
-  await Listing.findByIdAndUpdate(id , editedlisting);
-  res.redirect(`/listings/${id}`);
-}))
+  wrapAsync(listingController.update))
+app.put("/listings/:id", wrapAsync(listingController.updateform))
 
 //delete route
-app.delete("/listings/:id", wrapAsync(async (req,res)=>{
-  let {id} = req.params;
-  await Listing.findByIdAndDelete(id);
-  res.redirect(`/listings`);
-}))
+app.delete("/listings/:id", wrapAsync(listingController.delete))
 
 // review route
-app.post("/listings/:id/reviews",validateReview, wrapAsync(async (req,res)=>{
-  let listing = await Listing.findById(req.params.id);
-  let newReview = new Review(req.body.review);  //convert into schema format
-  listing.reviews.push(newReview);
-  await newReview.save();
-  await listing.save();  //existing document change
-  res.redirect(`/listings/${listing._id}`);
-}))
-app.delete("/listings/:id/reviews/:reviewId", wrapAsync(async (req,res) => {
-  let {id,reviewId} = req.params;
-  await Review.findByIdAndDelete(reviewId);
-  await Listing.findByIdAndUpdate(id, {$pull: {reviews: reviewId}});
-  res.redirect(`/listings/${id}`)
-}))
+app.post("/listings/:id/reviews", wrapAsync(listingController.review))
+app.delete("/listings/:id/reviews/:reviewId", wrapAsync(listingController.reviewDel))
 
 // error handling
 app.use("/", (req, res, next) => {
