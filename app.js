@@ -23,7 +23,7 @@ app.engine('ejs', engine);
 
 main(() => console.log("connected with wanderlust")).catch(err => console.log(err));
 async function main() {
-  await mongoose.connect(dbURL);
+  await mongoose.connect("mongodb+srv://sayanpub2020:sayan8945097611@cluster-demo.pah6g4g.mongodb.net/?retryWrites=true&w=majority&appName=Cluster-demo");
 }
 
 const validateListing = (req,res,next) => {
@@ -113,7 +113,6 @@ app.use("/", (req, res, next) => {
 })
 app.use((err, req, res, next) => {
   let {statusCode = 500, message = "Something went wrong !"} = err;
-  console.log(err);
   res.status(statusCode).render("error.ejs", {message});
 })
 
