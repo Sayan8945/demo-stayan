@@ -26,6 +26,13 @@ body {
     background: #ffffffdb;
     padding: 1rem;
 }
+.nav-btn {
+  color: #000 ;
+  font-weight: 500;
+  background: #ffffffdb;
+  padding: none !important;
+  border: none;
+}
 
 /* footer */
 .f-info-links a{

@@ -6,9 +6,12 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
         <div class="navbar-nav">
-          <a class="nav-link active" aria-current="page" href="http://localhost:8080/">Home</a>
-          <a class="nav-link" href="https://demo-stayan.onrender.com//listings#">All listings</a>
-          <a class="nav-link" href="https://demo-stayan.onrender.com//listings/new?">Add new listing</a>
+          <form class="nav-link" method="get" action="/">
+            <button class="nav-btn">Home</button></form>
+          <form class="nav-link" method="get" action="/listings">
+            <button class="nav-btn">All listings</button></form>
+          <form class="nav-link" method="get" action="/listings/new">
+            <button class="nav-btn">Add new listings</button></form>
           <!-- <a class="nav-link disabled" aria-disabled="true">Disabled</a> -->
         </div>
       </div>
